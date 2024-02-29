@@ -9,6 +9,8 @@ template GroupSig() {
     signal input pk3;
     signal input msgHash;  // (a) why is this needed?
 
+    signal output msgAttestation;
+
     // (b) pk generation
     component pkGen = MiMCSponge(1, 220, 1);
     pkGen.ins[0] <== sk;
@@ -22,9 +24,12 @@ template GroupSig() {
     interm <== (pk - pk1) * (pk - pk2);
     interm * (pk - pk3) === 0;
 
-    // fun fact!
-    signal dummy;
-    dummy <== msgHash * msgHash;
+    component sign = MiMCSponge(2, 220, 1);
+    sign.ins[0] <== sk;
+    sign.ins[1] <== msgHash;
+    sign.k <== 0;
+
+    msgAttestation <== sign.outs[0];
 }
 
 
